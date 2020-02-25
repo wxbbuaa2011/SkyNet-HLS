@@ -90,3 +90,46 @@ void dwconv(float *ifm, float *ofm, float *weight, float *bias, int relu, layer 
         }
     }
 }
+
+void DWCONV3X3(DT ifm[32][42][82], DT ofm[32][42][82], DT weight[32][3][3], DT bias[32], int relu)
+{
+
+    for(int i=0; i<3; i++){
+		for(int j=0; j<3; j++){
+			for(int h=1; h<=40; h++){
+				for(int w=1; w<=80; w++){
+					for(int c=0; c<32; c++){
+						ofm[c][h][w] += weight[c][i][j] * ifm[c][h+i-1][w+j-1];
+					}
+				}
+			}
+		}
+	}
+    for(int h=1; h<=40; h++){
+        for(int w=1; w<=80; w++){
+            for(int c=0; c<32; c++){
+                ofm[c][h][w] += bias[c];
+            }
+        }
+    }
+	if(relu==1){
+		for(int h=1; h<=40; h++){
+			for(int w=1; w<=80; w++){
+				for(int c=0; c<32; c++){
+                    if(ofm[c][h][w]<0)
+                        ofm[c][h][w] = 0;
+				}
+			}
+		}
+	}
+
+/*
+    for(int h=0; h<42; h++){
+        for(int w=0; w<82; w++){
+            for(int c=0; c<32; c++){
+                ofm[c][h][w] = ifm[c][h][w];
+            }
+        }
+    }
+*/
+}

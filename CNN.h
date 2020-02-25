@@ -28,17 +28,30 @@ struct layer
 	int iw, ih, ic, ow, oh, oc;
 	int k, s, p;
 };
+
+struct DT32
+{
+	DT data[32];
+};
+
 /**********utils.cpp************/
 void load_fm(float* fm, layer l);
 void load_weight(float *weight, int length);
 void load_dwconv_weight(float *weight, layer l);
 void load_pwconv_weight(float *weight, layer l);
 void load_bias(float *bias, layer l);
+void check(DT* result, DT* golden, layer l);
 void check_fm(float* fm, layer l);
 void show_fm(float* fm, layer l);
 
 void generate_fm(float* fm, layer l);
 void generate_weight(float* weight, layer l);
+
+
+void stitch(DT* ifm[4], DT* ofm);
+void distitch(DT* ifm, DT* ofm[4]);
+
+void DWCONV3X3(DT ifm[32][42][82], DT ofm[32][42][82], DT weight[32][3][3], DT bias[32], int relu);
 
 /**********operations************/
 void pwconv(float *ifm, float *ofm, float *weight, float *bias, int relu, layer l);
