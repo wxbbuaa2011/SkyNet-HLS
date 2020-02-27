@@ -178,11 +178,25 @@ void SkyNet_(DT* ifm, DT* ofm, DT* parameter)
     
     for(int Hx=0; Hx<8; Hx++)
     {	
+        Load_IFM(ifm, FM1, Hx, 0);
 		for(int Wx=0; Wx<8; Wx++) 
         {
-            Load_IFM(ifm, FM1, Hx, Wx);
-            DWCONV3X3(FM1, FM3, WBUF3x3[0]);
-            Add_Bias(FM3, BBUF[0], 1);
+            if(Wx%2==0)
+            {
+                Load_IFM(ifm, FM2, Hx, Wx+1);
+                {
+                    DWCONV3X3(FM1, FM3, WBUF3x3[0]);
+                    Add_Bias(FM3, BBUF[0], 1);
+                }
+            }
+            else
+            {
+                Load_IFM(ifm, FM1, Hx, Wx+1);
+                {
+                    DWCONV3X3(FM2, FM3, WBUF3x3[0]);
+                    Add_Bias(FM3, BBUF[0], 1);
+                }
+            }
             for(int Cx=0; Cx<2; Cx++)
             {
                 PWCONV1X1(FM3, FM5, WBUF1x1[Cx]);
@@ -223,9 +237,7 @@ void SkyNet_init()
 void SkyNet()
 {
     for(int p=0; p<4; p++)
-    {
         load_fm(data[p], config[0]);
-    }
     stitch(data, data_blob, config[0]);
     SkyNet_(data_blob, pwconv1_blob, parameter);
     distitch(pwconv1_blob, pwconv1, config[2]);
