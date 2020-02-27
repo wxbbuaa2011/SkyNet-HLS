@@ -1,19 +1,24 @@
 #include "CNN.h"
 
-void stitch(DT* ifm[4], DT* ofm)
+void stitch(DT* ifm[4], DT* ofm, layer l)
 {   
-    int offset_h[4] = {1,1,162,162};
-    int offset_w[4] = {1,322,1,322};
+    int offset_h[4];
+    offset_h[0] = offset_h[1] = 1;
+    offset_h[2] = offset_h[3] = l.oh + 2;
+    int offset_w[4];
+    offset_w[0] = offset_w[2] = 1;
+    offset_w[1] = offset_w[3] = l.ow + 2;
+
     for(int p=0; p<4; p++)
     {
-        for(int c=0; c<3; c++)
+        for(int c=0; c<l.oc; c++)
         {
-            for(int h=0; h<160; h++)
+            for(int h=0; h<l.oh; h++)
             {
-                for(int w=0; w<320; w++)
+                for(int w=0; w<l.ow; w++)
                 {
-                    int ifm_index = c*160*320 + h*320 + w;
-                    int ofm_index = c*323*643 + (h+offset_h[p])*643 + (w+offset_w[p]);
+                    int ifm_index = c*l.oh*l.ow + h*l.ow + w;
+                    int ofm_index = c*(l.oh*2+3)*(l.ow*2+3) + (h+offset_h[p])*(l.ow*2+3) + (w+offset_w[p]);
                     ofm[ofm_index] = ifm[p][ifm_index];
                 }
             }
@@ -21,20 +26,25 @@ void stitch(DT* ifm[4], DT* ofm)
     }
 }
 
-void distitch(DT* ifm, DT* ofm[4])
+void distitch(DT* ifm, DT* ofm[4], layer l)
 {   
-    int offset_h[4] = {1,1,162,162};
-    int offset_w[4] = {1,322,1,322};
+    int offset_h[4];
+    offset_h[0] = offset_h[1] = 1;
+    offset_h[2] = offset_h[3] = l.oh + 2;
+    int offset_w[4];
+    offset_w[0] = offset_w[2] = 1;
+    offset_w[1] = offset_w[3] = l.ow + 2;
+
     for(int p=0; p<4; p++)
     {
-        for(int c=0; c<3; c++)
+        for(int c=0; c<l.oc; c++)
         {
-            for(int h=0; h<160; h++)
+            for(int h=0; h<l.oh; h++)
             {
-                for(int w=0; w<320; w++)
+                for(int w=0; w<l.ow; w++)
                 {
-                    int ifm_index = c*323*643 + (h+offset_h[p])*643 + (w+offset_w[p]);
-                    int ofm_index = c*160*320 + h*320 + w;
+                    int ifm_index = c*(l.oh*2+3)*(l.ow*2+3) + (h+offset_h[p])*(l.ow*2+3) + (w+offset_w[p]);
+                    int ofm_index = c*l.oh*l.ow + h*l.ow + w;
                     ofm[p][ofm_index] = ifm[ifm_index];
                 }
             }
@@ -57,10 +67,9 @@ void generate_fm(DT* fm, layer l)
     }
 }
 
-void check(DT* result, DT* golden, layer l)
+void check(DT* result, DT* golden, int len, layer l)
 {
     int err = 0;
-    int len = l.oc*l.ow*l.oh;
     for (int j = 0; j < len; j++)
     {
         if (((result[j] - golden[j]) > check_scale) || ((result[j] - golden[j]) < -check_scale))
