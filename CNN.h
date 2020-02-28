@@ -35,30 +35,34 @@ struct DT32
 };
 
 /**********utils.cpp************/
-void load_fm(float* fm, layer l);
-void load_weight(float *weight, int length);
-void load_dwconv_weight(float *weight, layer l);
-void load_pwconv_weight(float *weight, layer l);
-void load_bias(float *bias, layer l);
+void load_fm(DT* fm, layer l);
+void load_weight(DT *weight, int length);
+void load_dwconv_weight(DT *weight, layer l);
+void load_pwconv_weight(DT *weight, layer l);
+void load_bias(DT *bias, layer l);
 void check(DT* result, DT* golden, int len, layer l);
-void check_fm(float* fm, layer l);
-void show_fm(float* fm, layer l);
+void check_fm(DT* fm, layer l);
+void show_fm(DT* fm, layer l);
 
-void generate_fm(float* fm, layer l);
-void generate_weight(float* weight, layer l);
+void generate_fm(DT* fm, layer l);
+void generate_weight(DT* weight, layer l);
 
-
+/**********transform.cpp************/
 void stitch(DT* ifm[4], DT* ofm, layer l);
 void distitch(DT* ifm, DT* ofm[4], layer l);
+void fm_DT_2_DT32(DT* in, DT32* out, layer l);
+void fm_DT32_2_DT(DT32* in, DT* out, layer l);
+void w_DT_2_DT32(DT* in, DT32* out, layer l);
+void b_DT_2_DT32(DT* in, DT32* out, layer l);
 
 void DWCONV3X3(DT IFM[32][42][82], DT OFM[32][42][82], DT WBUF3x3[32][3][3]);
 void PWCONV1X1(DT IFM[32][42][82], DT OFM[32][42][82], DT WBUF1x1[32][32]);
 void POOL(DT IFM[32][42][82], DT OFM[32][42][82]);
 
 /**********operations************/
-void pwconv(float *ifm, float *ofm, float *weight, float *bias, int relu, layer l);
-void dwconv(float *ifm, float *ofm, float *weight, float *bias, int relu, layer l);
-void maxpool(float *ifm, float *ofm, layer l);
-void concat(float *ifm1, float *ifm2, float *ofm, layer l1, layer l2);
-void reorg(float *ifm, float *ofm, layer l);
+void pwconv(DT *ifm, DT *ofm, DT *weight, DT *bias, int relu, layer l);
+void dwconv(DT *ifm, DT *ofm, DT *weight, DT *bias, int relu, layer l);
+void maxpool(DT *ifm, DT *ofm, layer l);
+void concat(DT *ifm1, DT *ifm2, DT *ofm, layer l1, layer l2);
+void reorg(DT *ifm, DT *ofm, layer l);
 #endif //CNN_H

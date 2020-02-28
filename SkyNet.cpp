@@ -22,18 +22,19 @@ layer config[layer_count] = {
 { "conv7",   40,20,96,   40,20,10,   1,1,0},    //conv7
 };
 
-void Load_IFM(DT* ifm, DT IBUF[32][42][82], int Hx, int Wx)
+void Load_IFM(DT32* ifm, DT IBUF[32][42][82], int Hx, int Wx)
 {
     int h_offset = Hx*40 + Hx/4;
     int w_offset = Wx*80 + Wx/4;
-    for (int c=0; c<32; c++)
-    {
+    
         for (int h=0; h<42; h++)
         {
             for (int w=0; w<82; w++)
             {
-                int ifm_index = c*643*323 + (h+h_offset)*643 + (w+w_offset);
-                IBUF[c][h][w] = ifm[ifm_index];
+                for (int c=0; c<32; c++)
+    {
+                int ifm_index = (h+h_offset)*643 + (w+w_offset);
+                IBUF[c][h][w] = ifm[ifm_index].data[c];
             }
         }
     }
@@ -170,7 +171,7 @@ void Compare(DT FM1[32][42][82], DT FM2[32][42][82])
     printf("error count: %d\n", error);
 }
 
-void SkyNet_(DT* ifm, DT* ofm, DT* parameter)
+void SkyNet_(DT32* ifm, DT* ofm, DT* parameter)
 {
     DT FM1[32][42][82]={0};
     DT FM2[32][42][82]={0};
@@ -230,6 +231,7 @@ void SkyNet_(DT* ifm, DT* ofm, DT* parameter)
 
 DT* data[4];
 DT* data_blob;
+DT32* data32_blob;
 DT* dwconv1[4];
 DT* dwconv1_blob;
 DT* pwconv1_blob;
@@ -250,6 +252,7 @@ void SkyNet_init()
         pool1[p] = (DT*)sds_alloc(64*80*160*sizeof(DT));
     }
     data_blob = (DT*)sds_alloc(32*323*643*sizeof(DT));
+    data32_blob = (DT32*)sds_alloc(32*323*643*sizeof(DT));
     dwconv1_blob = (DT*)sds_alloc(32*323*643*sizeof(DT));
     pwconv1_blob = (DT*)sds_alloc(64*323*643*sizeof(DT));
     pool1_blob = (DT*)sds_alloc(64*163*323*sizeof(DT));
@@ -262,7 +265,8 @@ void SkyNet()
     for(int p=0; p<4; p++)
         load_fm(data[p], config[0]);
     stitch(data, data_blob, config[0]);
-    SkyNet_(data_blob, pool1_blob, parameter);
+    fm_DT_2_DT32(data_blob, data32_blob, config[0]);
+    SkyNet_(data32_blob, pool1_blob, parameter);
     distitch(pool1_blob, pool1, config[3]);
     for(int p=0; p<4; p++)
         check_fm(pool1[p], config[3]);
