@@ -53,6 +53,7 @@ void distitch(DT* ifm, DT* ofm[4], layer l);
 
 void DWCONV3X3(DT IFM[32][42][82], DT OFM[32][42][82], DT WBUF3x3[32][3][3]);
 void PWCONV1X1(DT IFM[32][42][82], DT OFM[32][42][82], DT WBUF1x1[32][32]);
+void POOL(DT IFM[32][42][82], DT OFM[32][42][82]);
 
 /**********operations************/
 void pwconv(float *ifm, float *ofm, float *weight, float *bias, int relu, layer l);

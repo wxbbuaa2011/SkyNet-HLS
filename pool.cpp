@@ -64,3 +64,22 @@ void avgpool(float *ifm, float *ofm, layer l)
         }
     }
 }
+
+DT MAX(DT a, DT b, DT c, DT d)
+{
+#pragma HLS INLINE
+	DT t1 = a > b ? a : b;
+	DT t2 = c > d ? c : d;
+	return t1 > t2 ? t1 : t2;
+}
+
+void POOL(DT IFM[32][42][82], DT OFM[32][42][82])
+{
+	for(int h=1; h<=20; h++){
+		for(int w=1; w<=40; w++){
+			for (int c=0; c<32; c++){
+                OFM[c][h][w] = MAX(IFM[c][2*h-1][2*w-1],IFM[c][2*h-1][2*w],IFM[c][2*h][2*w-1],IFM[c][2*h][2*w]);
+			}
+		}
+	}
+}
