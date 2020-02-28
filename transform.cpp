@@ -61,7 +61,7 @@ void fm_DT_2_DT32(DT* in, DT32* out, layer l)
 		{
 			for (int tm = 0; tm < 32; tm++)
 			{
-				out[Mx*(2*l.oh+3)*(2*l.ow+3)+i].data[tm]=in[(tm+Mx*32) * (2*l.oh+3)*(2*l.ow+3) + i];
+				out[Mx*(2*l.oh+3)*(2*l.ow+3)+i].data[tm]=in[(tm+Mx*32)*(2*l.oh+3)*(2*l.ow+3)+i];
 			}
 		}
 	}
@@ -71,11 +71,11 @@ void fm_DT32_2_DT(DT32* in, DT* out, layer l)
 {
 	for (int Mx = 0; Mx < l.oc / 32; Mx++)
 	{
-		for (int i = 0; i < l.oh*l.ow; i++)
+		for (int i = 0; i < (2*l.oh+3)*(2*l.ow+3); i++)
 		{
 			for (int tm = 0; tm < 32; tm++)
 			{
-				out[(tm+Mx*32) * l.oh*l.ow + i] = in[Mx*l.oh*l.ow+i].data[tm];
+				out[(tm+Mx*32)*(2*l.oh+3)*(2*l.ow+3) + i] = in[Mx*(2*l.oh+3)*(2*l.ow+3)+i].data[tm];
 			}
 		}
 	}
