@@ -36,7 +36,7 @@ struct DT32
 
 /**********utils.cpp************/
 void load_fm(DT* fm, layer l);
-void load_weight(DT *weight, int length);
+void load_weight(DT32 *weight, int length);
 void load_dwconv_weight(DT *weight, layer l);
 void load_pwconv_weight(DT *weight, layer l);
 void load_bias(DT *bias, layer l);
