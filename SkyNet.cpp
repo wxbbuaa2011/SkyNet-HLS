@@ -65,7 +65,7 @@ void Load_WBUF1x1(DT* weight, DT WBUF1x1[32][32])
     }
 }
 
-void Export_DWCONV1(DT* ofm, DT OBUF[32][42][82], int Hx, int Wx)
+void Export_DWCONV1(DT32* ofm, DT OBUF[32][42][82], int Hx, int Wx)
 {
     int h_offset = Hx*40 + Hx/4;
     int w_offset = Wx*80 + Wx/4;
@@ -75,8 +75,8 @@ void Export_DWCONV1(DT* ofm, DT OBUF[32][42][82], int Hx, int Wx)
         {
             for (int w=1; w<=80; w++)
             {
-                int ofm_index = c*323*643 + (h+h_offset)*643 + (w+w_offset);
-                ofm[ofm_index] = OBUF[c][h][w];
+                int ofm_index = (h+h_offset)*643 + (w+w_offset);
+                ofm[ofm_index].data[c] = OBUF[c][h][w];
             }
         }
     }
@@ -215,14 +215,7 @@ void SkyNet_(DT32* ifm, DT32* ofm, DT* parameter)
                     Add_Bias(FM3, BBUF[0], 1);
                 }
             }
-            for(int Cx=0; Cx<2; Cx++)
-            {
-                PWCONV1X1(FM3, FM4, WBUF1x1[Cx]);
-                Add_Bias(FM4, BBUF[Cx+1], 1);
-                POOL(FM4, FM5);
-                Export_POOL1(ofm, FM5, Hx, Wx, Cx);
-                Clear_FM(FM4);
-            }
+            Export_DWCONV1(ofm, FM3, Hx, Wx);
             Clear_FM(FM3);
 		}
 	}
@@ -231,6 +224,7 @@ void SkyNet_(DT32* ifm, DT32* ofm, DT* parameter)
 DT* data[4];
 DT* data_blob;
 DT32* data_blob32;
+DT32* dwconv1_bb32;
 DT* dwconv1[4];
 DT* dwconv1_blob;
 DT* pwconv1_blob;
@@ -253,6 +247,7 @@ void SkyNet_init()
     }
     data_blob = (DT*)sds_alloc(32*323*643*sizeof(DT));
     data_blob32 = (DT32*)sds_alloc(32*323*643*sizeof(DT));
+    dwconv1_bb32 = (DT32*)sds_alloc(32*323*643*sizeof(DT));
     dwconv1_blob = (DT*)sds_alloc(32*323*643*sizeof(DT));
     pwconv1_blob = (DT*)sds_alloc(64*323*643*sizeof(DT));
     pool1_blob32 = (DT32*)sds_alloc(64*163*323*sizeof(DT));
@@ -267,9 +262,9 @@ void SkyNet()
         load_fm(data[p], config[0]);
     stitch(data, data_blob, config[0]);
     fm_DT_2_DT32(data_blob, data_blob32, config[0]);
-    SkyNet_(data_blob32, pool1_blob32, parameter);
-    fm_DT32_2_DT(pool1_blob32, pool1_blob, config[3]);
-    distitch(pool1_blob, pool1, config[3]);
+    SkyNet_(data_blob32, dwconv1_bb32, parameter);
+    fm_DT32_2_DT(dwconv1_bb32, dwconv1_blob, config[1]);
+    distitch(dwconv1_blob, dwconv1, config[1]);
     for(int p=0; p<4; p++)
-        check_fm(pool1[p], config[3]);
+        check_fm(dwconv1[p], config[1]);
 }

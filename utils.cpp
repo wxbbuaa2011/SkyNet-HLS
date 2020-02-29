@@ -51,7 +51,7 @@ void load_fm(DT* fm, layer l)
 void load_weight(DT *weight, int length)
 {
     char nstr[50];
-    sprintf(nstr, "../weights/SkyNet.wt");
+    sprintf(nstr, "../weights/conv.wt");
     FILE *fp = fopen(nstr, "rb");
     fread(weight, 1, length*sizeof(DT), fp);
     fclose(fp);
