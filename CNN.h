@@ -43,6 +43,7 @@ void load_bias(DT *bias, layer l);
 void check(DT* result, DT* golden, int len, layer l);
 void check_fm(DT* fm, layer l);
 void show_fm(DT* fm, layer l);
+void load_weight_dt(DT* weight , int length);
 
 void generate_fm(DT* fm, layer l);
 void generate_weight(DT* weight, layer l);

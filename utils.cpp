@@ -48,6 +48,15 @@ void load_fm(DT* fm, layer l)
     fclose(fp);
 }
 
+void load_weight_dt(DT* weight , int length)
+{
+    char nstr[50];
+    sprintf(nstr, "../weights/dwconv2.wt");
+    FILE *fp = fopen(nstr, "rb");
+    fread(weight, 1, length*sizeof(DT), fp);
+    fclose(fp);
+}
+
 void load_weight(DT32* weight , int length)
 {
     char nstr[50];
